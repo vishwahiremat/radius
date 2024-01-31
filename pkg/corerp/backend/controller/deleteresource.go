@@ -41,6 +41,7 @@ func NewDeleteResource(opts ctrl.Options) (ctrl.Controller, error) {
 // data model, deletes the resource from the deployment processor, and deletes the resource from storage.
 // It returns an error if any of these steps fail.
 func (c *DeleteResource) Run(ctx context.Context, request *ctrl.Request) (ctrl.Result, error) {
+
 	obj, err := c.StorageClient().Get(ctx, request.ResourceID)
 	if err != nil {
 		return ctrl.NewFailedResult(v1.ErrorDetails{Message: err.Error()}), err

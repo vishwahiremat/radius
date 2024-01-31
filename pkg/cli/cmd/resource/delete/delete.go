@@ -160,7 +160,7 @@ func (r *Runner) Run(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
+	fmt.Println(deleted)
 	if deleted {
 		r.Output.LogInfo("Resource deleted")
 	} else {

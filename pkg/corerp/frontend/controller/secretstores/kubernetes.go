@@ -209,7 +209,7 @@ func UpsertSecret(ctx context.Context, newResource, old *datamodel.SecretStore, 
 	err = options.KubeClient.Get(ctx, runtimeclient.ObjectKey{Namespace: ns, Name: name}, ksecret)
 	if apierrors.IsNotFound(err) {
 		// If resource in incoming request references resource, then the resource must exist.
-		if ref != "" {
+		if ref != "" && newResource.Properties.Application != "" {
 			return rest.NewBadRequestResponse(fmt.Sprintf("'%s' referenced resource does not exist.", ref)), nil
 		}
 		app, _ := resources.ParseResource(newResource.Properties.Application)
