@@ -191,7 +191,7 @@ type BicepRecipeProperties struct {
 	// REQUIRED; Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.
 	TemplatePath *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 
 	// Connect to the Bicep registry using HTTP (not-HTTPS). This should be used when the registry is known not to support HTTPS,
@@ -213,7 +213,7 @@ type BicepRecipePropertiesUpdate struct {
 	// REQUIRED; Discriminator property for RecipeProperties.
 	TemplateKind *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 
 	// Connect to the Bicep registry using HTTP (not-HTTPS). This should be used when the registry is known not to support HTTPS,
@@ -638,6 +638,15 @@ type EnvironmentResourceUpdateProperties struct {
 	Simulated *bool
 }
 
+// EnvironmentVariables describes structure enabling environment variables to be set.
+type EnvironmentVariables struct {
+	// OPTIONAL; Contains additional key/value pairs not defined in the schema.
+	AdditionalProperties map[string]any
+
+	// The provider secrets passed as environment variables.
+	Secrets map[string]*ProviderSecret
+}
+
 // EphemeralVolume - Specifies an ephemeral volume for a container
 type EphemeralVolume struct {
 	// REQUIRED; Discriminator property for Volume.
@@ -951,7 +960,7 @@ type GatewayTLS struct {
 
 // GitAuthConfig - Authentication information used to access private Terraform modules from Git repository sources.
 type GitAuthConfig struct {
-	// Personal Access Token (PAT) configuration used to authenticate to Git platforms.
+	// Personal Access Token (PAT) configuration used to authenticate to Git platforms..
 	Pat map[string]*SecretConfig
 }
 
@@ -1347,45 +1356,63 @@ func (p *PersistentVolume) GetVolume() *Volume {
 	}
 }
 
-// Providers - The Cloud providers configuration
+// ProviderConfigProperties specifies provider configuration details needed for recipes.
+type ProviderConfigProperties struct {
+	// OPTIONAL; Contains additional key/value pairs not defined in the schema.
+	AdditionalProperties map[string]any
+
+	// The secrets for the referenced provider resource.
+	Secrets map[string]*ProviderSecret
+}
+
+// ProviderSecret - Specifies the secret details for the provider.
+type ProviderSecret struct {
+	// REQUIRED; The key for the secret in the secret store.
+	Key *string
+
+	// REQUIRED; The resource id for the secret store containing credentials.
+	Source *string
+}
+
+// Providers - The Cloud providers configuration.
 type Providers struct {
-	// The AWS cloud provider configuration
+	// The AWS cloud provider configuration.
 	Aws *ProvidersAws
 
-	// The Azure cloud provider configuration
+	// The Azure cloud provider configuration.
 	Azure *ProvidersAzure
 }
 
-// ProvidersAws - The AWS cloud provider definition
+// ProvidersAws - The AWS cloud provider definition.
 type ProvidersAws struct {
-	// REQUIRED; Target scope for AWS resources to be deployed into. For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'
+	// REQUIRED; Target scope for AWS resources to be deployed into. For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'.
 	Scope *string
 }
 
-// ProvidersAwsUpdate - The AWS cloud provider definition
+// ProvidersAwsUpdate - The AWS cloud provider definition.
 type ProvidersAwsUpdate struct {
-	// Target scope for AWS resources to be deployed into. For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'
+	// Target scope for AWS resources to be deployed into. For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'.
 	Scope *string
 }
 
-// ProvidersAzure - The Azure cloud provider definition
+// ProvidersAzure - The Azure cloud provider definition.
 type ProvidersAzure struct {
-	// REQUIRED; Target scope for Azure resources to be deployed into. For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'
+	// REQUIRED; Target scope for Azure resources to be deployed into. For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'.
 	Scope *string
 }
 
-// ProvidersAzureUpdate - The Azure cloud provider definition
+// ProvidersAzureUpdate - The Azure cloud provider definition.
 type ProvidersAzureUpdate struct {
-	// Target scope for Azure resources to be deployed into. For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'
+	// Target scope for Azure resources to be deployed into. For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'.
 	Scope *string
 }
 
-// ProvidersUpdate - The Cloud providers configuration
+// ProvidersUpdate - The Cloud providers configuration.
 type ProvidersUpdate struct {
-	// The AWS cloud provider configuration
+	// The AWS cloud provider configuration.
 	Aws *ProvidersAwsUpdate
 
-	// The Azure cloud provider configuration
+	// The Azure cloud provider configuration.
 	Azure *ProvidersAzureUpdate
 }
 
@@ -1400,16 +1427,19 @@ type Recipe struct {
 
 // RecipeConfigProperties - Configuration for Recipes. Defines how each type of Recipe should be configured and run.
 type RecipeConfigProperties struct {
-	// Specifies the terraform config properties
+	// Specifies the environment variables needed for the recipes.
+	Env *EnvironmentVariables
+
+	// Specifies the Terraform config properties.
 	Terraform *TerraformConfigProperties
 }
 
 // RecipeGetMetadata - Represents the request body of the getmetadata action.
 type RecipeGetMetadata struct {
-	// REQUIRED; The name of the recipe registered to the environment
+	// REQUIRED; The name of the recipe registered to the environment.
 	Name *string
 
-	// REQUIRED; Type of the resource this recipe can be consumed by. For example: 'Applications.Datastores/mongoDatabases'
+	// REQUIRED; Type of the resource this recipe can be consumed by. For example: 'Applications.Datastores/mongoDatabases'.
 	ResourceType *string
 }
 
@@ -1441,7 +1471,7 @@ type RecipeProperties struct {
 	// REQUIRED; Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.
 	TemplatePath *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 }
 
@@ -1453,7 +1483,7 @@ type RecipePropertiesUpdate struct {
 	// REQUIRED; Discriminator property for RecipeProperties.
 	TemplateKind *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 
 	// Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.
@@ -1708,6 +1738,9 @@ func (t *TCPHealthProbeProperties) GetHealthProbeProperties() *HealthProbeProper
 type TerraformConfigProperties struct {
 	// Authentication information used to access private Terraform module sources. Supported module sources: Git.
 	Authentication *AuthConfig
+
+	// Specifies the details of Terraform providers.
+	Providers map[string][]*ProviderConfigProperties
 }
 
 // TerraformRecipeProperties - Represents Terraform recipe properties.
@@ -1718,7 +1751,7 @@ type TerraformRecipeProperties struct {
 	// REQUIRED; Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.
 	TemplatePath *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 
 	// Version of the template to deploy. For Terraform recipes using a module registry this is required, but must be omitted
@@ -1740,7 +1773,7 @@ type TerraformRecipePropertiesUpdate struct {
 	// REQUIRED; Discriminator property for RecipeProperties.
 	TemplateKind *string
 
-	// Key/value parameters to pass to the recipe template at deployment
+	// Key/value parameters to pass to the recipe template at deployment.
 	Parameters map[string]any
 
 	// Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.

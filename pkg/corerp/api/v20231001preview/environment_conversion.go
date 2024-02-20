@@ -39,7 +39,6 @@ const (
 // ConvertTo converts from the versioned Environment resource to version-agnostic datamodel.
 func (src *EnvironmentResource) ConvertTo() (v1.DataModelInterface, error) {
 	// Note: SystemData conversion isn't required since this property comes ARM and datastore.
-
 	converted := &datamodel.Environment{
 		BaseResource: v1.BaseResource{
 			TrackedResource: v1.TrackedResource{
@@ -205,9 +204,17 @@ func toRecipeConfigDatamodel(config *RecipeConfigProperties) datamodel.RecipeCon
 
 				}
 			}
+
+			// Convert RecipeConfig Terraform Providers
+			recipeConfig.Terraform.Providers = toRecipeConfigTerraformProvidersDatamodel(config)
 		}
+
+		// Convert RecipeConfig Environment Variables
+		recipeConfig.Env = toRecipeConfigEnvDatamodel(config)
+
 		return recipeConfig
 	}
+
 	return datamodel.RecipeConfigProperties{}
 }
 
@@ -230,7 +237,14 @@ func fromRecipeConfigDatamodel(config datamodel.RecipeConfigProperties) *RecipeC
 					}
 				}
 			}
+
+			// Convert RecipeConfig Terraform Providers
+			recipeConfig.Terraform.Providers = fromRecipeConfigTerraformProvidersDatamodel(config)
 		}
+
+		// Convert RecipeConfig Environment Variables
+		recipeConfig.Env = fromRecipeConfigEnvDatamodel(config)
+
 		return recipeConfig
 	}
 	return nil
@@ -395,4 +409,100 @@ func fromRecipePropertiesClassificationDatamodel(e datamodel.EnvironmentRecipePr
 		}
 	}
 	return nil
+}
+
+func toRecipeConfigTerraformProvidersDatamodel(config *RecipeConfigProperties) map[string][]datamodel.ProviderConfigProperties {
+	if config.Terraform == nil || config.Terraform.Providers == nil {
+		return nil
+	}
+
+	dm := map[string][]datamodel.ProviderConfigProperties{}
+
+	for k, v := range config.Terraform.Providers {
+		dm[k] = []datamodel.ProviderConfigProperties{}
+
+		for _, provider := range v {
+			secrets := map[string]datamodel.ProviderSecret{}
+			for secretKey, secret := range provider.Secrets {
+				if secret.Source == nil || secret.Key == nil {
+					continue
+				}
+
+				secrets[secretKey] = datamodel.ProviderSecret{
+					Source: *secret.Source,
+					Key:    *secret.Key,
+				}
+			}
+
+			dm[k] = append(dm[k], datamodel.ProviderConfigProperties{
+				AdditionalProperties: provider.AdditionalProperties,
+				Secrets:              secrets,
+			})
+		}
+	}
+
+	return dm
+}
+
+func fromRecipeConfigTerraformProvidersDatamodel(config datamodel.RecipeConfigProperties) map[string][]*ProviderConfigProperties {
+	if config.Terraform.Providers == nil {
+		return nil
+	}
+
+	providers := map[string][]*ProviderConfigProperties{}
+
+	for k, v := range config.Terraform.Providers {
+		providers[k] = []*ProviderConfigProperties{}
+
+		for _, provider := range v {
+			secrets := map[string]*ProviderSecret{}
+			for secretKey, secret := range provider.Secrets {
+				secrets[secretKey] = &ProviderSecret{
+					Source: to.Ptr(secret.Source),
+					Key:    to.Ptr(secret.Key),
+				}
+			}
+
+			providers[k] = append(providers[k], &ProviderConfigProperties{
+				AdditionalProperties: provider.AdditionalProperties,
+				Secrets:              secrets,
+			})
+		}
+	}
+
+	return providers
+}
+
+func toRecipeConfigEnvDatamodel(config *RecipeConfigProperties) datamodel.EnvironmentVariables {
+	if config.Env == nil {
+		return datamodel.EnvironmentVariables{}
+	}
+
+	secrets := make(map[string]datamodel.ProviderSecret, len(config.Env.Secrets))
+	for k, v := range config.Env.Secrets {
+		secrets[k] = datamodel.ProviderSecret{
+			Source: to.String(v.Source),
+			Key:    to.String(v.Key),
+		}
+	}
+
+	return datamodel.EnvironmentVariables{
+		AdditionalProperties: config.Env.AdditionalProperties,
+		Secrets:              secrets,
+	}
+}
+
+func fromRecipeConfigEnvDatamodel(config datamodel.RecipeConfigProperties) *EnvironmentVariables {
+	secrets := make(map[string]*ProviderSecret, len(config.Env.Secrets))
+	for k, v := range config.Env.Secrets {
+		secrets[k] = &ProviderSecret{
+			Source: to.Ptr(v.Source),
+			Key:    to.Ptr(v.Key),
+		}
+	}
+
+	return &EnvironmentVariables{
+		AdditionalProperties: config.Env.AdditionalProperties,
+		Secrets:              secrets,
+	}
 }

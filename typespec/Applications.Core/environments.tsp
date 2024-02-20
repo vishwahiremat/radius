@@ -39,7 +39,8 @@ using OpenAPI;
 namespace Applications.Core;
 
 @doc("The environment resource")
-model EnvironmentResource is TrackedResourceRequired<EnvironmentProperties, "environments">{
+model EnvironmentResource
+  is TrackedResourceRequired<EnvironmentProperties, "environments"> {
   @doc("environment name")
   @key("environmentName")
   @path
@@ -75,25 +76,31 @@ model EnvironmentProperties {
 
 @doc("Configuration for Recipes. Defines how each type of Recipe should be configured and run.")
 model RecipeConfigProperties {
-  @doc("Specifies the terraform config properties")
+  @doc("Specifies the Terraform config properties.")
   terraform?: TerraformConfigProperties;
+
+  @doc("Specifies the environment variables needed for the recipes.")
+  env?: EnvironmentVariables;
 }
 
 @doc("Configuration for Terraform Recipes. Controls how Terraform plans and applies templates as part of Recipe deployment.")
-model TerraformConfigProperties{
-    @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
+model TerraformConfigProperties {
+  @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
   authentication?: AuthConfig;
+
+  @doc("Specifies the details of Terraform providers.")
+  providers?: Record<Array<ProviderConfigProperties>>;
 }
 
 @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
-model AuthConfig{
+model AuthConfig {
   @doc("Authentication information used to access private Terraform modules from Git repository sources.")
   git?: GitAuthConfig;
 }
 
 @doc("Authentication information used to access private Terraform modules from Git repository sources.")
-model GitAuthConfig{
-  @doc("Personal Access Token (PAT) configuration used to authenticate to Git platforms.")  
+model GitAuthConfig {
+  @doc("Personal Access Token (PAT) configuration used to authenticate to Git platforms..")
   pat?: Record<SecretConfig>;
 }
 
@@ -103,24 +110,47 @@ model SecretConfig {
   secret?: string;
 }
 
-@doc("The Cloud providers configuration")
+#suppress "@azure-tools/typespec-azure-core/bad-record-type"
+@doc("ProviderConfigProperties specifies provider configuration details needed for recipes.")
+model ProviderConfigProperties extends Record<unknown> {
+  @doc("The secrets for the referenced provider resource.")
+  secrets?: Record<ProviderSecret>;
+}
+
+#suppress "@azure-tools/typespec-azure-core/bad-record-type"
+@doc("EnvironmentVariables describes structure enabling environment variables to be set.")
+model EnvironmentVariables extends Record<unknown> {
+  @doc("The provider secrets passed as environment variables.")
+  secrets?: Record<ProviderSecret>;
+}
+
+@doc("Specifies the secret details for the provider.")
+model ProviderSecret {
+  @doc("The resource id for the secret store containing credentials.")
+  source: string;
+
+  @doc("The key for the secret in the secret store.")
+  key: string;
+}
+
+@doc("The Cloud providers configuration.")
 model Providers {
-  @doc("The Azure cloud provider configuration")
+  @doc("The Azure cloud provider configuration.")
   azure?: ProvidersAzure;
 
-  @doc("The AWS cloud provider configuration")
+  @doc("The AWS cloud provider configuration.")
   aws?: ProvidersAws;
 }
 
-@doc("The Azure cloud provider definition")
+@doc("The Azure cloud provider definition.")
 model ProvidersAzure {
-  @doc("Target scope for Azure resources to be deployed into.  For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'")
+  @doc("Target scope for Azure resources to be deployed into.  For example: '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testGroup'.")
   scope: string;
 }
 
-@doc("The AWS cloud provider definition")
+@doc("The AWS cloud provider definition.")
 model ProvidersAws {
-  @doc("Target scope for AWS resources to be deployed into.  For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'")
+  @doc("Target scope for AWS resources to be deployed into.  For example: '/planes/aws/aws/accounts/000000000000/regions/us-west-2'.")
   scope: string;
 }
 
@@ -130,7 +160,7 @@ model RecipeProperties {
   @doc("Path to the template provided by the recipe. Currently only link to Azure Container Registry is supported.")
   templatePath: string;
 
-  @doc("Key/value parameters to pass to the recipe template at deployment")
+  @doc("Key/value parameters to pass to the recipe template at deployment.")
   parameters?: {};
 }
 
@@ -154,10 +184,10 @@ model TerraformRecipeProperties extends RecipeProperties {
 
 @doc("Represents the request body of the getmetadata action.")
 model RecipeGetMetadata {
-  @doc("Type of the resource this recipe can be consumed by. For example: 'Applications.Datastores/mongoDatabases'")
+  @doc("Type of the resource this recipe can be consumed by. For example: 'Applications.Datastores/mongoDatabases'.")
   resourceType: string;
 
-  @doc("The name of the recipe registered to the environment")
+  @doc("The name of the recipe registered to the environment.")
   name: string;
 }
 

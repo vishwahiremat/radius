@@ -50,12 +50,17 @@ type EnvironmentProperties struct {
 type RecipeConfigProperties struct {
 	// Terraform specifies the terraform config properties
 	Terraform TerraformConfigProperties `json:"terraform,omitempty"`
+
+	Env EnvironmentVariables `json:"env,omitempty"`
 }
 
 // TerraformConfigProperties - Specifies the terraform config properties
 type TerraformConfigProperties struct {
 	// Authentication specifies authentication information needed to use private terraform module repositories.
 	Authentication AuthConfig `json:"authentication,omitempty"`
+
+	// Providers specifies the Terraform provider configurations.
+	Providers map[string][]ProviderConfigProperties `json:"providers,omitempty"`
 }
 
 // AuthConfig - Specifies authentication information needed to use private terraform module repositories.
@@ -122,4 +127,30 @@ type ProvidersAzure struct {
 type ProvidersAWS struct {
 	// Scope is the target level for deploying the aws resources
 	Scope string `json:"scope,omitempty"`
+}
+
+// EnvironmentVariables describes structure enabling environment variables to be set.
+type EnvironmentVariables struct {
+	// Additional properties for the resource
+	AdditionalProperties map[string]any `json:"additionalProperties,omitempty"`
+
+	// Secrets values provided for the resource
+	Secrets map[string]ProviderSecret `json:"secrets,omitempty"`
+}
+
+// ProviderSecret specifies the secret details for the provider.
+type ProviderSecret struct {
+	// Source represents the resource id for the secret store containing credentials.
+	Source string `json:"source,omitempty"`
+
+	// Key represents the key to the secret in the secret store.
+	Key string `json:"key,omitempty"`
+}
+
+type ProviderConfigProperties struct {
+	// Additional properties for the resource
+	AdditionalProperties map[string]any `json:"additionalProperties,omitempty"`
+
+	// Secrets values provided for the resource
+	Secrets map[string]ProviderSecret `json:"secrets,omitempty"`
 }

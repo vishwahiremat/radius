@@ -20,15 +20,16 @@
         },
         "recipeConfig": {
             "terraform": {
-              "authentication": {
-                "git": {
-                  "pat": {}
-                }
-              }
+                "authentication": {
+                    "git": {
+                        "pat": {}
+                    }
+                },
+                "providers": {}
             }
         },
         "recipes": {
-            "Applications.Datastores/mongoDatabases":{
+            "Applications.Datastores/mongoDatabases": {
                 "cosmos-recipe": {
                     "templateKind": "bicep",
                     "templatePath": "br:ghcr.io/sampleregistry/radius/recipes/cosmosdb"

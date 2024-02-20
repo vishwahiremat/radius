@@ -888,11 +888,10 @@ func withGlobalGitConfigFile(tmpdir string, content string) func() {
 
 	tmpGitConfigFile := filepath.Join(tmpdir, ".gitconfig")
 
-	os.WriteFile(
-		tmpGitConfigFile,
-		[]byte(content),
-		0777,
-	)
+	err := os.WriteFile(tmpGitConfigFile, []byte(content), 0777)
+	if err != nil {
+		panic(err)
+	}
 
 	prevGitConfigEnv := os.Getenv("HOME")
 	os.Setenv("HOME", tmpdir)
