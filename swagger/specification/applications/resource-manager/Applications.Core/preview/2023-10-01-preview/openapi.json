@@ -2002,6 +2002,9 @@
           },
           "Create or Update a secret store resource with valueFrom": {
             "$ref": "./examples/SecretStores_CreateOrUpdateValueFrom.json"
+          },
+          "Create or Update a secret store resource with global scope": {
+            "$ref": "./examples/SecretStores_CreateOrUpdate_GlobalScope.json"
           }
         },
         "x-ms-long-running-operation-options": {
@@ -2723,35 +2726,13 @@
       "type": "object",
       "description": "The updatable properties of the ApplicationResource.",
       "properties": {
-        "compute": {
-          "$ref": "#/definitions/EnvironmentComputeUpdate",
-          "description": "The compute resource used by application environment."
-        },
-        "providers": {
-          "$ref": "#/definitions/ProvidersUpdate",
-          "description": "Cloud providers configuration for the environment."
-        },
-        "simulated": {
-          "type": "boolean",
-          "description": "Simulated environment."
-        },
-        "recipes": {
-          "type": "object",
-          "description": "Specifies Recipes linked to the Environment.",
-          "additionalProperties": {
-            "additionalProperties": {
-              "$ref": "#/definitions/RecipePropertiesUpdate"
-            },
-            "type": "object"
-          }
-        },
-        "recipeConfig": {
-          "$ref": "#/definitions/RecipeConfigProperties",
-          "description": "Configuration for Recipes. Defines how each type of Recipe should be configured and run."
+        "environment": {
+          "type": "string",
+          "description": "Fully qualified resource ID for the environment that the application is linked to"
         },
         "extensions": {
           "type": "array",
-          "description": "The environment extension.",
+          "description": "The application extension.",
           "items": {
             "$ref": "#/definitions/Extension"
           },
@@ -4059,7 +4040,7 @@
       "properties": {
         "pat": {
           "type": "object",
-          "description": "Personal Access Token (PAT) configuration used to authenticate to Git platforms..",
+          "description": "Personal Access Token (PAT) configuration used to authenticate to Git platforms.",
           "additionalProperties": {
             "$ref": "#/definitions/SecretConfig"
           }
@@ -4831,7 +4812,7 @@
       "properties": {
         "terraform": {
           "$ref": "#/definitions/TerraformConfigProperties",
-          "description": "Specifies the Terraform config properties."
+          "description": "Configuration for Terraform Recipes. Controls how Terraform plans and applies templates as part of Recipe deployment."
         },
         "env": {
           "$ref": "#/definitions/EnvironmentVariables",
@@ -5079,7 +5060,7 @@
       "properties": {
         "secret": {
           "type": "string",
-          "description": "The resource id for the Applications.Core/SecretStore resource containing credentials. Secret names required: 'pat', and 'username' is optional"
+          "description": "The ID of an Applications.Core/SecretStore resource containing the Git platform personal access token (PAT). The secret store must have a secret named 'pat', containing the PAT value. A secret named 'username' is optional, containing the username associated with the pat. By default no username is specified."
         }
       }
     },
@@ -5194,7 +5175,6 @@
         }
       },
       "required": [
-        "application",
         "data"
       ]
     },

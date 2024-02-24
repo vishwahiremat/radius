@@ -76,7 +76,7 @@ model EnvironmentProperties {
 
 @doc("Configuration for Recipes. Defines how each type of Recipe should be configured and run.")
 model RecipeConfigProperties {
-  @doc("Specifies the Terraform config properties.")
+  @doc("Configuration for Terraform Recipes. Controls how Terraform plans and applies templates as part of Recipe deployment.")
   terraform?: TerraformConfigProperties;
 
   @doc("Specifies the environment variables needed for the recipes.")
@@ -84,29 +84,29 @@ model RecipeConfigProperties {
 }
 
 @doc("Configuration for Terraform Recipes. Controls how Terraform plans and applies templates as part of Recipe deployment.")
-model TerraformConfigProperties {
-  @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
+model TerraformConfigProperties{
+    @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
   authentication?: AuthConfig;
 
-  @doc("Specifies the details of Terraform providers.")
+   @doc("Specifies the details of Terraform providers.")
   providers?: Record<Array<ProviderConfigProperties>>;
 }
 
 @doc("Authentication information used to access private Terraform module sources. Supported module sources: Git.")
-model AuthConfig {
+model AuthConfig{
   @doc("Authentication information used to access private Terraform modules from Git repository sources.")
   git?: GitAuthConfig;
 }
 
 @doc("Authentication information used to access private Terraform modules from Git repository sources.")
-model GitAuthConfig {
-  @doc("Personal Access Token (PAT) configuration used to authenticate to Git platforms..")
+model GitAuthConfig{
+  @doc("Personal Access Token (PAT) configuration used to authenticate to Git platforms.")  
   pat?: Record<SecretConfig>;
 }
 
 @doc("Personal Access Token (PAT) configuration used to authenticate to Git platforms.")
 model SecretConfig {
-  @doc("The resource id for the Applications.Core/SecretStore resource containing credentials. Secret names required: 'pat', and 'username' is optional")
+  @doc("The ID of an Applications.Core/SecretStore resource containing the Git platform personal access token (PAT). The secret store must have a secret named 'pat', containing the PAT value. A secret named 'username' is optional, containing the username associated with the pat. By default no username is specified.")
   secret?: string;
 }
 

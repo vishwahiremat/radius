@@ -117,23 +117,11 @@ type ApplicationResourceUpdate struct {
 
 // ApplicationResourceUpdateProperties - The updatable properties of the ApplicationResource.
 type ApplicationResourceUpdateProperties struct {
-	// The compute resource used by application environment.
-	Compute EnvironmentComputeUpdateClassification
+	// Fully qualified resource ID for the environment that the application is linked to
+	Environment *string
 
-	// The environment extension.
+	// The application extension.
 	Extensions []ExtensionClassification
-
-	// Cloud providers configuration for the environment.
-	Providers *ProvidersUpdate
-
-	// Configuration for Recipes. Defines how each type of Recipe should be configured and run.
-	RecipeConfig *RecipeConfigProperties
-
-	// Specifies Recipes linked to the Environment.
-	Recipes map[string]map[string]RecipePropertiesUpdateClassification
-
-	// Simulated environment.
-	Simulated *bool
 }
 
 // AuthConfig - Authentication information used to access private Terraform module sources. Supported module sources: Git.
@@ -960,7 +948,7 @@ type GatewayTLS struct {
 
 // GitAuthConfig - Authentication information used to access private Terraform modules from Git repository sources.
 type GitAuthConfig struct {
-	// Personal Access Token (PAT) configuration used to authenticate to Git platforms..
+	// Personal Access Token (PAT) configuration used to authenticate to Git platforms.
 	Pat map[string]*SecretConfig
 }
 
@@ -1430,7 +1418,7 @@ type RecipeConfigProperties struct {
 	// Specifies the environment variables needed for the recipes.
 	Env *EnvironmentVariables
 
-	// Specifies the Terraform config properties.
+	// Configuration for Terraform Recipes. Controls how Terraform plans and applies templates as part of Recipe deployment.
 	Terraform *TerraformConfigProperties
 }
 
@@ -1555,8 +1543,9 @@ type RuntimesProperties struct {
 
 // SecretConfig - Personal Access Token (PAT) configuration used to authenticate to Git platforms.
 type SecretConfig struct {
-	// The resource id for the Applications.Core/SecretStore resource containing credentials. Secret names required: 'pat', and
-// 'username' is optional
+	// The ID of an Applications.Core/SecretStore resource containing the Git platform personal access token (PAT). The secret
+// store must have a secret named 'pat', containing the PAT value. A secret named
+// 'username' is optional, containing the username associated with the pat. By default no username is specified.
 	Secret *string
 }
 
@@ -1586,11 +1575,11 @@ type SecretStoreListSecretsResult struct {
 
 // SecretStoreProperties - The properties of SecretStore
 type SecretStoreProperties struct {
-	// REQUIRED; Fully qualified resource ID for the application
-	Application *string
-
 	// REQUIRED; An object to represent key-value type secrets
 	Data map[string]*SecretValueProperties
+
+	// Fully qualified resource ID for the application
+	Application *string
 
 	// Fully qualified resource ID for the environment that the application is linked to
 	Environment *string

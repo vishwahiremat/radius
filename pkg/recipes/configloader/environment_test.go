@@ -68,8 +68,8 @@ func TestGetConfiguration(t *testing.T) {
 							Authentication: &model.AuthConfig{
 								Git: &model.GitAuthConfig{
 									Pat: map[string]*model.SecretConfig{
-										"dev.azure.com": &model.SecretConfig{
-											Secret: to.Ptr("secretStoreID"),
+										"dev.azure.com": {
+											Secret: to.Ptr("/planes/radius/local/resourceGroups/testGroup/providers/Applications.Core/secretStores/secret"),
 										},
 									},
 								},
@@ -92,8 +92,8 @@ func TestGetConfiguration(t *testing.T) {
 						Authentication: datamodel.AuthConfig{
 							Git: datamodel.GitAuthConfig{
 								PAT: map[string]datamodel.SecretConfig{
-									"dev.azure.com": datamodel.SecretConfig{
-										Secret: "secretStoreID",
+									"dev.azure.com": {
+										Secret: "/planes/radius/local/resourceGroups/testGroup/providers/Applications.Core/secretStores/secret",
 									},
 								},
 							},
