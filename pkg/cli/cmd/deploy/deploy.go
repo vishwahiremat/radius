@@ -35,6 +35,8 @@ import (
 	"github.com/radius-project/radius/pkg/cli/workspaces"
 	"github.com/radius-project/radius/pkg/corerp/api/v20231001preview"
 	"github.com/radius-project/radius/pkg/to"
+	"github.com/radius-project/radius/pkg/ucp/resources"
+	resources_azure "github.com/radius-project/radius/pkg/ucp/resources/azure"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/maps"
 )
@@ -222,8 +224,20 @@ func (r *Runner) Validate(cmd *cobra.Command, args []string) error {
 			}
 		}
 		if env.Properties.Providers.Azure != nil {
+			scope := *env.Properties.Providers.Azure.Scope
+			parsedScope, err := resources.Parse(scope)
+			if err != nil {
+				return fmt.Errorf("invalid Azure provider scope %q is configured on the Environment, error parsing: %s", scope, err.Error())
+			}
+
+			subscription := parsedScope.FindScope(resources_azure.ScopeSubscriptions)
+			resourceGroup := parsedScope.FindScope(resources_azure.ScopeResourceGroups)
+			if subscription == "" || resourceGroup == "" {
+				return fmt.Errorf("invalid Azure provider scope %q is configured on the Environment, subscription is required in the scope", scope)
+			}
+
 			r.Providers.Azure = &clients.AzureProvider{
-				Scope: *env.Properties.Providers.Azure.Scope,
+				Scope: scope,
 			}
 		}
 	}
